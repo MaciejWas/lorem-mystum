@@ -1,12 +1,9 @@
-Name:          lorem-markdownum
+Name:          lorem-mystum
 Version:       0.3.0.1
-Synopsis:      A lorem ipsum generator for markdown
-Homepage:      http://jaspervdj.be/lorem-markdownum
+Synopsis:      A lorem ipsum generator for MyST flavour of markdown
 License:       BSD3
 License-file:  LICENSE
-Author:        Jasper Van der Jeugt <m@jaspervdj.be>
-Maintainer:    Jasper Van der Jeugt <m@jaspervdj.be>
-Copyright:     2013 (c) Jasper Van der Jeugt
+Copyright:     2013 (c) Jasper Van der Jeugt; 2025 (c) Maciej Wasilewski
 Category:      Web
 Build-type:    Simple
 Cabal-version: >= 1.8
@@ -47,7 +44,7 @@ Executable lorem-markdownum-web
     LoremMarkdownum.Web.Views
 
   Build-depends:
-    lorem-markdownum,
+    lorem-mystum,
     base             >= 4    && < 5,
     blaze-html       >= 0.6  && < 0.10,
     bytestring       >= 0.9  && < 0.13,
