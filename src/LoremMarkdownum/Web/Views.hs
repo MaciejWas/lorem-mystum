@@ -36,7 +36,7 @@ index pc mc markdown = H.docTypeHtml $ do
         H.hr
         H.div H.! A.id "controls" $ do
             H.form ! A.id "form-generate" ! A.method "GET" $ do
-                H.div ! A.id "advanced" ! A.class_ "slider" ! A.style "height: 0px" $
+                H.div ! A.id "advanced" ! A.class_ "slider" ! A.style "height: 0px" $ do
                     H.div ! A.class_ "columns" ! A.style "display: flex;" $ do
                         H.div ! A.class_ "column" $ do
                             checkbox (mcNoHeaders mc)        "no-headers"        "No headers"
@@ -59,6 +59,18 @@ index pc mc markdown = H.docTypeHtml $ do
                                 ! A.class_ "small"
                             H.label ! A.for "num-blocks" ! A.class_ "input-label"
                                 $ "Number of blocks"
+
+                    H.input ! A.type_ "text" ! A.size "2"
+                        ! A.name "myst-roles" ! A.id "myst-roles"
+                        ! A.class_ "large"
+                    H.label ! A.for "myst-roles" ! A.class_ "input-label"
+                        $ "MyST roles (comma-separated)"
+
+                    H.input ! A.type_ "text" ! A.size "2"
+                        ! A.name "myst-directives" ! A.id "myst-directives"
+                        ! A.class_ "large"
+                    H.label ! A.for "myst-directives" ! A.class_ "input-label"
+                        $ "MyST directives (comma-separated)"
 
                 checkbox False "show-advanced" "Advanced settings"
                 " "

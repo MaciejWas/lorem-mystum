@@ -158,6 +158,12 @@ getIntParam name = do
 
 
 --------------------------------------------------------------------------------
+getListParam :: ByteString -> AppM [T.Text]
+getListParam name = do
+    param <- Snap.getParam name
+    return $ T.splitOn "," $ T.pack $ BC.unpack $ fromMaybe "" param
+
+--------------------------------------------------------------------------------
 getMarkdownConfig :: AppM MarkdownConfig
 getMarkdownConfig = do
     (mc, _)          <- ask
@@ -172,10 +178,15 @@ getMarkdownConfig = do
     underscoreEm     <- getBoolParam "underscore-em"
     underscoreStrong <- getBoolParam "underscore-strong"
     numBlocks        <- getIntParam  "num-blocks"
+    mySTRoles        <- getListParam "myst-roles"
+    mySTDirectives   <- getListParam "myst-directives"
     fencedCodeBlocks <- getBoolParam "fenced-code-blocks"
+
     return mc
         { mcNoHeaders        = noHeaders
         , mcNoCode           = noCode
+        , mcMySTRoles        = mySTRoles
+        , mcMySTDirectives   = mySTDirectives
         , mcNoQuotes         = noQuotes
         , mcNoLists          = noLists
         , mcNoInlineMarkup   = noInlineMarkup

@@ -47,7 +47,9 @@ document.addEventListener("DOMContentLoaded", function() {
             "underscore-strong",
             "num-blocks",
             "no-wrapping",
-            "fenced-code-blocks"
+            "fenced-code-blocks",
+            "myst-roles",
+            "myst-directives",
         ];
 
         // Form processing

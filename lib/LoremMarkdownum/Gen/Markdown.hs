@@ -37,6 +37,7 @@ import           Control.Monad                 (forM, forM_, replicateM, when)
 import           Control.Monad.Reader          (ReaderT, ask, runReaderT, asks)
 import           Control.Monad.State           (StateT, evalStateT, get, modify)
 import           Data.List                     (intersperse)
+import           Data.String                   (fromString)
 import           Data.Map.Strict               (Map)
 import qualified Data.Map.Strict               as M
 import           Data.Maybe                    (maybeToList)
@@ -63,6 +64,8 @@ import           LoremMarkdownum.Token
 data MarkdownConfig = MarkdownConfig
     { mcLengthMarkov     :: Markov (Token Int)
     , mcWordFrequency    :: Map Int (FrequencyTree Text)
+    , mcMySTRoles        :: [Text]
+    , mcMySTDirectives   :: [Text]
     , mcCodeConfig       :: CodeConfig
     , mcNoHeaders        :: Bool
     , mcNoCode           :: Bool
@@ -85,8 +88,29 @@ mkDefaultMarkdownConfig :: Markov (Token Int)
                         -> Map Int (FrequencyTree Text)
                         -> CodeConfig
                         -> MarkdownConfig
-mkDefaultMarkdownConfig mrkv ft cc = MarkdownConfig mrkv ft cc
-    False False False False False False False False False Nothing 2 False False
+mkDefaultMarkdownConfig lengthMarkov frequencyTree codeConfig
+   = MarkdownConfig 
+    { mcLengthMarkov     = lengthMarkov
+    , mcWordFrequency    = frequencyTree
+    , mcMySTRoles        = ["todo", "user", "issue", "bug", "fixme"]
+    , mcMySTDirectives   = ["note", "alert", "warning", "tip", "important", "comment"]
+    , mcCodeConfig       = codeConfig
+    , mcNoHeaders        = False
+    , mcNoCode           = False  
+    , mcNoQuotes         = False  
+    , mcNoLists          = False  
+    , mcNoInlineMarkup   = False 
+    , mcReferenceLinks   = False 
+    , mcUnderlineHeaders = False 
+    , mcUnderscoreEm     = False 
+    , mcUnderscoreStrong = False
+    , mcNumBlocks        = Nothing 
+    , mcHeaderDepth      = 2 
+    , mcNoExternalLinks  = False
+    , mcFencedCodeBlocks = False
+    }
+
+
 
 
 --------------------------------------------------------------------------------
@@ -249,7 +273,7 @@ genOrderedList = do
 genMySTDirective :: MonadGen m => MarkdownGen m Block
 genMySTDirective = do
     section <- genSection 3 3 3
-    let title = "TODO"
+    title <-  (asks mcMySTDirectives) >>= sampleFromList
     return $ MySTDirective title section
 
 --------------------------------------------------------------------------------
@@ -534,7 +558,10 @@ previewBlock (OrderedListB l)   = previewOrderedList l
 previewBlock (UnorderedListB l) = previewUnorderedList l
 previewBlock (CodeB c)          = H.pre $ H.toHtml $ runPrint $ printCode c
 previewBlock (QuoteB q)         = H.blockquote $ previewParagraph q
-previewBlock (MySTDirective _ b) = H.div $ mconcat $ map previewBlock b
+previewBlock (MySTDirective d b) = let cssClass = fromString (T.unpack d ++ " myst-directive" ) 
+                                    in  H.div ! A.class_ cssClass $ do
+                                            H.p ! A.class_ "myst-directive-title" $ H.toHtml d
+                                            H.div ! A.class_ "myst-directive-content" $ mconcat $ map previewBlock b
 
 
 --------------------------------------------------------------------------------
