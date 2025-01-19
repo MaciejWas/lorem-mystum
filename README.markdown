@@ -8,6 +8,10 @@
 [markdown]: http://daringfireball.net/projects/markdown/
 [myst]: https://mystmd.org/
 
+## Credit
+
+This is a modified version of [Lorem Markdownum](https://github.com/jaspervdj/lorem-markdownum) authored by [Jasper Van der Jeugt](https://github.com/jaspervdj)
+
 ## Building and running from source
 
 - Install [stack](https://docs.haskellstack.org/en/stable/install_and_upgrade/).
