@@ -115,6 +115,7 @@ data Block
     | ParagraphB Paragraph
     | OrderedListB [Phrase]
     | UnorderedListB [Phrase]
+    | MySTDirective Text [Block]
     | CodeB Code
     | QuoteB Paragraph
     deriving (Show)
@@ -147,6 +148,7 @@ data Markup
     = PlainM  Text
     | ItalicM (Stream Markup)
     | BoldM   (Stream Markup)
+    | MySTRole Text (Stream Markup)
     | LinkM   (Stream Markup) Text
     deriving (Eq, Ord, Show)
 
@@ -207,11 +209,13 @@ genSpecialBlock = do
     noCode   <- asks mcNoCode
     noQuotes <- asks mcNoQuotes
     noLists  <- asks mcNoLists
+    noMyST   <- return False
     let freqs =
             [ (if noLists  then 0 else 1, OrderedListB   <$> genOrderedList)
             , (if noLists  then 0 else 1, UnorderedListB <$> genUnorderedList)
             , (if noCode   then 0 else 2, CodeB          <$> genCodeBlock)
             , (if noQuotes then 0 else 1, QuoteB         <$> genParagraph)
+            , (if noMyST   then 0 else 3, genMySTDirective)
             ]
     if sum (map fst freqs) <= 0
         then ParagraphB <$> genParagraph
@@ -241,6 +245,12 @@ genOrderedList = do
     numElements <- randomInt (3, 6)
     replicateM numElements genPhrase
 
+--------------------------------------------------------------------------------
+genMySTDirective :: MonadGen m => MarkdownGen m Block
+genMySTDirective = do
+    section <- genSection 3 3 3
+    let title = "TODO"
+    return $ MySTDirective title section
 
 --------------------------------------------------------------------------------
 genUnorderedList :: MonadGen m => MarkdownGen m [Phrase]
@@ -365,6 +375,9 @@ genMarkupConstructor :: MonadGen m => Stream Markup -> MarkdownGen m Markup
 genMarkupConstructor m = oneOf
     [ return $ ItalicM m
     , return $ BoldM m
+    , do
+        role <- sampleFromList ["user", "issues", "todo", "bug", "fixme"]
+        return $ MySTRole role m
     , genLink >>= \link -> return $ LinkM m link
     ]
 
@@ -428,6 +441,10 @@ printBlock mc (HeaderB h)        = printHeader mc h
 printBlock mc (ParagraphB p)     = printParagraph mc p
 printBlock mc (OrderedListB l)   = printOrderedList mc l
 printBlock mc (UnorderedListB l) = printUnorderedList mc l
+printBlock mc (MySTDirective t b) = do
+    printText "```{" >> printText t >> printText "}" >> printNl
+    printIndent4 $ printMarkdown mc b >> printNl
+    printText "```" >> printNl
 printBlock mc  (CodeB c)
     | mcFencedCodeBlocks mc      = do
         printText "```" >> printNl
@@ -490,6 +507,8 @@ printSentence mc = printStream printMarkup
         | otherwise        =
             printText "[" >> printStream printMarkup m >> printText "](" >>
             printText l >> printText ")"
+    printMarkup (MySTRole r m) = printText "`" >> printText r >> printText "`{" >>
+                                 printStream printMarkup m >> printText "}"
 
 
 --------------------------------------------------------------------------------
@@ -515,6 +534,7 @@ previewBlock (OrderedListB l)   = previewOrderedList l
 previewBlock (UnorderedListB l) = previewUnorderedList l
 previewBlock (CodeB c)          = H.pre $ H.toHtml $ runPrint $ printCode c
 previewBlock (QuoteB q)         = H.blockquote $ previewParagraph q
+previewBlock (MySTDirective _ b) = H.div $ mconcat $ map previewBlock b
 
 
 --------------------------------------------------------------------------------
@@ -563,3 +583,4 @@ previewMarkup (PlainM t)  = H.toHtml t
 previewMarkup (ItalicM s) = H.em $ previewSentence s
 previewMarkup (BoldM s)   = H.strong $ previewSentence s
 previewMarkup (LinkM s h) = H.a ! A.href (H.toValue h) $ previewSentence s
+previewMarkup (MySTRole r s) = H.code $ H.span (previewSentence s)

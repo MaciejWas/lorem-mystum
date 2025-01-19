@@ -27,34 +27,12 @@ index pc mc markdown = H.docTypeHtml $ do
     H.head $ do
         H.meta H.! A.charset "UTF-8"
         H.meta H.! A.name "viewport" H.! A.content "width=device-width, initial-scale=1"
-        H.title "Lorem Markdownum"
+        H.title "Lorem MySTum"
         H.link ! A.rel "stylesheet" ! A.type_ "text/css" ! A.href "lorem-markdownum.css"
         H.script ! A.type_ "text/javascript" ! A.src "lorem-markdownum.js"  $ ""
 
     H.body $ do
-        H.header "Lorem Markdownum"
-        H.hr
-        H.div ! A.id "info" $ do
-            H.p $ do
-                "Inspired by the many excellent "
-                H.a ! A.href loremIpsumUrl $ "lorem ipsum generators"
-                ", this simple webapp generates structured placeholder text in "
-                H.a ! A.href markdownUrl $ "markdown format"
-                ". In order to do so, it uses "
-                H.a ! A.href markovChainUrl $ "Markov Chains"
-                " and many heuristics."
-
-            H.p $ do
-                "Written in "
-                H.a ! A.href haskellUrl $ "Haskell"
-                " by "
-                H.a ! A.href jaspervdjUrl $ "Jasper Van der Jeugt"
-                ". The source code is "
-                H.a ! A.href githubUrl $ "on GitHub"
-                " and an "
-                H.a ! A.href httpApiUrl $ "HTTP API"
-                " is also available!"
-
+        H.header "Lorem MySTum"
         H.hr
         H.div H.! A.id "controls" $ do
             H.form ! A.id "form-generate" ! A.method "GET" $ do
